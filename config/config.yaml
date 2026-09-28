@@ -1,0 +1,47 @@
+# Runtime parameters — LOG-C2-122 (runtime-tunable params live here, not in agent.yaml)
+
+# Retry / timeout for the outer AgentBaseGraph backbone
+max_retry: 3
+timeout_s: 30
+
+# Checkpointer — not required while HITL is disabled (see hitl below).
+memory_enabled: false
+
+# HITL is disabled for this template (MR-A design decision).
+# Human involvement is realised via the /feedback mode (async, explicit-approval
+# accumulation), NOT via the synchronous backbone interrupt(). Therefore PB-7 is
+# auto-waived (non-HITL). If Design review later requires a synchronous low-confidence
+# interrupt, flip hitl.enabled: true + memory_enabled: true and add the hitl_allowed-guarded
+# D6 pattern — PB-7 then becomes mandatory.
+hitl:
+  enabled: false
+
+# Domain retrieval / rule-corpus knobs (consumed by the inner domain workflow graph).
+# top_k / score_threshold tuned for safety-critical DG output (conservative recall).
+retrieval:
+  top_k: 8
+  score_threshold: 0.75
+
+confidence_threshold: 0.75
+
+# LLM sampling — deterministic for regulation-consistency reasoning.
+llm:
+  temperature: 0.0
+  max_tokens: 4000
+
+# Deployment injects these as provisioned, customer-dedicated connections at
+# startup.  There is intentionally no default DB or KB connection: unresolved
+# callers fail closed before any read or write.
+db_connections: {}
+kb_connections: {}
+caller_customer_map: {}
+
+# Stage 1 deterministic checks; these are advisory consistency checks only.
+required_documents_by_transport:
+  air: ["sds", "packing_certificate"]
+  sea: ["sds", "packing_certificate"]
+  road: ["sds", "packing_certificate"]
+class_packing_rules:
+  "1": ["I", "II", "III"]
+  "2": ["I", "II", "III"]
+  "3": ["I", "II", "III"]

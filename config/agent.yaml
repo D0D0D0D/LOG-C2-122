@@ -1,0 +1,37 @@
+# Agent Manifest - AgentRegistry entry point
+# This file is required for AgentRegistry auto-discovery (lazy-load architecture).
+
+id: "LOG-C2-122"
+name: "Logistics Dangerous-Goods Document Consistency Agent"
+namespace: "log"
+version: "1.0.0"
+enabled: true
+category: "Cat 2"
+# Static generation contract. Omitted by legacy templates defaults to deterministic.
+# This AG drives its LLM stage through the config["llm"] injection seam (BaseLLM), so the
+# truthful declaration is llm — omitting it would record an LLM template as deterministic.
+generation_mode: "llm"  # deterministic | llm
+industry: "LOG"
+
+# Base pattern (L1-direct inheritance; DocGenerationAgent pattern)
+base_type: "DocGenerationAgent"  # RAGAgent | ChatAgent | ReActAgent | DocGenerationAgent
+
+# Entry point
+class: "src.graph.DangerousGoodsDocConsistencyAgent"
+
+# Security
+required_trust_level: "VERIFIED_EXTERNAL"
+
+capabilities:
+  - "dangerous-goods document consistency review"
+  - "evidence-linked consistency brief generation"
+  - "approved feedback accumulation"
+output_contract: "consistency_brief"
+hitl_enabled: false
+
+requires:
+  extras: []
+  secrets: []
+
+# Runtime-tunable parameters live in config/config.yaml - NOT here.
+# agent.yaml is the static manifest (AgentRegistry): id/name/version/category/industry/requires.
